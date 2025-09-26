@@ -1,0 +1,3 @@
+alias send='./.venv/bin/python ./send.py'
+alias tell='./.venv/bin/python ./tell.py'
+alias monitor='./.venv/bin/python ./viewChats.py'
