@@ -158,7 +158,7 @@ def renderMessage(message: ChatMessage, user):
     for sect in coloredText:
         content = content.replace(
             f"`{sect[0]}{sect[1]}`",
-            termcolor.colored(sect[1], COLOR_CHARS[sect[0]]),
+            termcolor.colored(sect[1], COLOR_CHARS[sect[0]]) + "[38;2;122;178;244m",
         )
 
     timestr = termcolor.colored(
