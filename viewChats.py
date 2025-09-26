@@ -185,18 +185,20 @@ def renderMessage(message: ChatMessage, user):
     return f"{timestr} {channel} {sender} {body}"
 
 
-fetch(600)
-flush()
+if __name__ == "__main__":
 
-for message in allChats[USER]:
-    print(renderMessage(message, USER))
-
-try:
-    while True:
-        newChats = fetch(120)["new"]
-        if len(newChats[USER]) > 0:
-            for message in newChats[USER]:
-                print(renderMessage(message, USER))
-        time.sleep(2)
-except KeyboardInterrupt:
+    fetch(600)
     flush()
+
+    for message in allChats[USER]:
+        print(renderMessage(message, USER))
+
+    try:
+        while True:
+            newChats = fetch(120)["new"]
+            if len(newChats[USER]) > 0:
+                for message in newChats[USER]:
+                    print(renderMessage(message, USER))
+            time.sleep(2)
+    except KeyboardInterrupt:
+        flush()
