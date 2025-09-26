@@ -1,4 +1,4 @@
-# hackmud Python Chat API
+# hackmud Python CLI Chat Client
 
 ## Setup
 
@@ -17,8 +17,12 @@ When you need to update these, just run `setup.py` again.
 
 ## Usage
 
-Make sure to have `from chat import ChatAPI` at the beginning of every python file. This will give you the `ChatAPI` class, which you want to make an instance of.
+In VSCode make two shell instances, and put them side-by-side.
 
-## Snippets
+Then, in both shells, source `aliases.txt`
 
-There is a file called `chatAPI.code-snippets`. If you prefer to not use the functions I have made and instead want just the raw API code, this file has snippets containing exactly that; just uncomment the contents.
+Then, in one shell, enter `monitor`; this shell is going to be where your chats are displayed.
+
+In the other shell, you can use the `send` and `tell` aliases. Be careful with some characters in the message you send, you will have to escape some thing.
+
+Syntax is `<send/tell> USER TARGET MSG`
