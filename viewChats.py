@@ -191,14 +191,14 @@ if __name__ == "__main__":
     flush()
 
     for message in allChats[USER]:
-        print(renderMessage(message, USER))
+        print(renderMessage(message, USER), flush=True)
 
     try:
         while True:
             newChats = fetch(120)["new"]
             if len(newChats[USER]) > 0:
                 for message in newChats[USER]:
-                    print(renderMessage(message, USER))
+                    print(renderMessage(message, USER), flush=True)
             time.sleep(2)
     except KeyboardInterrupt:
         flush()
