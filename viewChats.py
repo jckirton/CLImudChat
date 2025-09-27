@@ -162,7 +162,7 @@ def renderMessage(message: ChatMessage, user):
         )
 
     timestr = termcolor.colored(
-        time.strftime("%H%M", time.localtime(message["t"])), COLOR_CHARS["C"]
+        time.strftime("%Y-%m-%d %H%M", time.localtime(message["t"])), COLOR_CHARS["C"]
     )
 
     sender = message["from_user"]
