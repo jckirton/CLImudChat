@@ -11,4 +11,4 @@ pip install -r $fileDir/requirements.txt
 
 $fileDir/.venv/bin/python $fileDir/setup.py
 
-rm $0
+# rm $0
