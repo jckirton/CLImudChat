@@ -17,6 +17,13 @@ if len(argv) > 1:
 else:
     USER = input("Input user: ")
 
+if len(argv) > 2:
+    FILTER_SENDER = argv[2]
+elif len(argv) < 2:
+    FILTER_SENDER = input("Filter message sender? ")
+else:
+    FILTER_SENDER = False
+
 
 class ChatMessage(TypedDict):
     id: str
@@ -190,15 +197,36 @@ if __name__ == "__main__":
     fetch(600)
     flush()
 
-    for message in allChats[USER]:
-        print(renderMessage(message, USER), flush=True)
+    if FILTER_SENDER:
+        for message in allChats[USER]:
+            if message["from_user"] == FILTER_SENDER:
+                print(renderMessage(message, USER), flush=True)
+            else:
+                pass
 
-    try:
-        while True:
-            newChats = fetch(120)["new"]
-            if len(newChats[USER]) > 0:
-                for message in newChats[USER]:
-                    print(renderMessage(message, USER), flush=True)
-            time.sleep(2)
-    except KeyboardInterrupt:
-        flush()
+        try:
+            while True:
+                newChats = fetch(120)["new"]
+                if len(newChats[USER]) > 0:
+                    for message in newChats[USER]:
+                        if message["from_user"] == FILTER_SENDER:
+                            print(renderMessage(message, USER), flush=True)
+                        else:
+                            pass
+                time.sleep(2)
+        except KeyboardInterrupt:
+            flush()
+
+    else:
+        for message in allChats[USER]:
+            print(renderMessage(message, USER), flush=True)
+
+        try:
+            while True:
+                newChats = fetch(120)["new"]
+                if len(newChats[USER]) > 0:
+                    for message in newChats[USER]:
+                        print(renderMessage(message, USER), flush=True)
+                time.sleep(2)
+        except KeyboardInterrupt:
+            flush()
