@@ -227,8 +227,7 @@ def chatMonitor(
                             pass
                 time.sleep(2)
         except KeyboardInterrupt:
-            pass
-            # flush(chatsCache, allChats)
+            flush(chatsCache, allChats)
 
     elif filter_sender:
         for message in allChats[user]:
@@ -249,8 +248,7 @@ def chatMonitor(
                             pass
                 time.sleep(2)
         except KeyboardInterrupt:
-            pass
-            # flush(chatsCache, allChats)
+            flush(chatsCache, allChats)
 
     elif filter_channel:
         for message in allChats[user]:
@@ -286,28 +284,33 @@ def chatMonitor(
                         print(renderMessage(message, user), flush=True)
                 time.sleep(2)
         except KeyboardInterrupt:
-            pass
-            # flush(chatsCache, allChats)
+            flush(chatsCache, allChats)
 
 
 if __name__ == "__main__":
     if len(argv) > 1:
-        USER = argv[1]
+        user = argv[1]
     else:
-        USER = input("Input user: ")
+        user = input("Input user: ")
 
     if len(argv) > 2:
-        FILTER_SENDER = argv[2]
+        filterSender = argv[2]
     elif len(argv) < 2:
-        FILTER_SENDER = input("Filter message sender? ")
+        filterSender = input("Filter message sender? ")
     else:
-        FILTER_SENDER = None
+        filterSender = None
+
+    if filterSender:
+        filterSender = "".join(filterSender.split(" ")).split(",")
 
     if len(argv) > 3:
-        FILTER_CHANNEL = argv[3]
+        filterChannel = argv[3]
     elif len(argv) < 2:
-        FILTER_CHANNEL = input("Filter channel? ")
+        filterChannel = input("Filter channel? ")
     else:
-        FILTER_CHANNEL = None
+        filterChannel = None
 
-    chatMonitor(USER, FILTER_SENDER, FILTER_CHANNEL)
+    if filterChannel:
+        filterChannel = "".join(filterChannel.split(" ")).split(",")
+
+    chatMonitor(user, filterSender, filterChannel)
