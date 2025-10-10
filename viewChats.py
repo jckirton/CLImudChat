@@ -6,25 +6,6 @@ from typing import TypedDict, NotRequired
 import time
 
 
-chat = ChatAPI()
-allChats: dict[str, list[dict]]
-
-cacheDir = f"{path[0]}/cache"
-chatsCache = f"{path[0]}/cache/chatHistory.json"
-
-if len(argv) > 1:
-    USER = argv[1]
-else:
-    USER = input("Input user: ")
-
-if len(argv) > 2:
-    FILTER_SENDER = argv[2]
-elif len(argv) < 2:
-    FILTER_SENDER = input("Filter message sender? ")
-else:
-    FILTER_SENDER = False
-
-
 class ChatMessage(TypedDict):
     id: str
     t: float
@@ -36,27 +17,12 @@ class ChatMessage(TypedDict):
     to_user: NotRequired[str]
 
 
-try:
-    os.mkdir(cacheDir)
-except FileExistsError:
-    pass
-try:
-    with open(chatsCache) as f:
-        allChats = json.load(f)
-        for user in allChats:
-            allChats[user].sort(key=lambda message: message["t"])
-except FileNotFoundError:
-    allChats = {}
-    for user in chat.users:
-        allChats[user] = []
-
-
-def flush():
+def flush(chatsCache, allChats):
     with open(chatsCache, "w") as f:
         json.dump(allChats, f, indent=4)
 
 
-def fetch(seconds: int | float = 10, initial=False):
+def fetch(chat: ChatAPI, allChats, seconds: int | float = 10, initial=False):
     fetched: dict[str, list[dict]] = chat.read(after=seconds)
     newChats: dict[str, list[dict]] = {}.copy()
     for user in fetched:
@@ -192,41 +158,143 @@ def renderMessage(message: ChatMessage, user):
     return f"{timestr} {channel} {sender} {body}"
 
 
-if __name__ == "__main__":
+def chatMonitor(
+    user: str,
+    /,
+    filter_sender: str | list | False | None = None,
+    filter_channel: str | list | False | None = None,
+    chat: ChatAPI = ChatAPI(),
+    cacheDir=f"{path[0]}/cache",
+    allChats: dict[str, list[dict]] | None = None,
+):
+    chatsCache = f"{cacheDir}/chatHistory.json"
 
-    fetch(600)
-    flush()
+    if allChats is None:
+        try:
+            os.mkdir(cacheDir)
+        except FileExistsError:
+            pass
+        try:
+            with open(chatsCache) as f:
+                allChats = json.load(f)
+                for username in allChats:
+                    allChats[username].sort(key=lambda message: message["t"])
+        except FileNotFoundError:
+            allChats = {}
+            for username in chat.users:
+                allChats[username] = []
 
-    if FILTER_SENDER:
-        for message in allChats[USER]:
-            if message["from_user"] == FILTER_SENDER:
-                print(renderMessage(message, USER), flush=True)
+    fetch(chat, allChats, 600)
+    flush(chatsCache, allChats)
+
+    if type(filter_sender) is str:
+        filter_sender = [filter_sender]
+    if type(filter_channel) is str:
+        filter_channel = [filter_channel]
+
+    if filter_channel:
+        for channel in filter_channel:
+            if channel == "tells":
+                filter_channel[filter_channel.index(channel)] = "tell"
+
+    if filter_sender and filter_channel:
+        for message in allChats[user]:
+            if (
+                message["from_user"] in filter_sender
+                and message.get("channel", "tell") in filter_channel
+            ):
+                print(renderMessage(message, user), flush=True)
             else:
                 pass
 
         try:
             while True:
-                newChats = fetch(120)["new"]
-                if len(newChats[USER]) > 0:
-                    for message in newChats[USER]:
-                        if message["from_user"] == FILTER_SENDER:
-                            print(renderMessage(message, USER), flush=True)
+                newChats = fetch(chat, allChats, 120)["new"]
+                if len(newChats[user]) > 0:
+                    for message in newChats[user]:
+                        if (
+                            message["from_user"] in filter_sender
+                            and message.get("channel", "tell") in filter_channel
+                        ):
+                            print(renderMessage(message, user), flush=True)
                         else:
                             pass
                 time.sleep(2)
         except KeyboardInterrupt:
-            flush()
+            flush(chatsCache, allChats)
 
-    else:
-        for message in allChats[USER]:
-            print(renderMessage(message, USER), flush=True)
+    elif filter_sender:
+        for message in allChats[user]:
+            if message["from_user"] in filter_sender:
+                print(renderMessage(message, user), flush=True)
+            else:
+                pass
 
         try:
             while True:
-                newChats = fetch(120)["new"]
-                if len(newChats[USER]) > 0:
-                    for message in newChats[USER]:
-                        print(renderMessage(message, USER), flush=True)
+                newChats = fetch(chat, allChats, 120)["new"]
+                if len(newChats[user]) > 0:
+                    for message in newChats[user]:
+                        if message["from_user"] in filter_sender:
+                            print(renderMessage(message, user), flush=True)
+                        else:
+                            pass
                 time.sleep(2)
         except KeyboardInterrupt:
-            flush()
+            flush(chatsCache, allChats)
+
+    elif filter_channel:
+        for message in allChats[user]:
+            if message.get("channel", "tell") in filter_channel:
+                print(renderMessage(message, user), flush=True)
+            else:
+                pass
+
+        try:
+            while True:
+                newChats = fetch(chat, allChats, 120)["new"]
+                if len(newChats[user]) > 0:
+                    for message in newChats[user]:
+                        if message.get("channel", "tell") in filter_channel:
+                            print(renderMessage(message, user), flush=True)
+                        else:
+                            pass
+                time.sleep(2)
+        except KeyboardInterrupt:
+            flush(chatsCache, allChats)
+    else:
+        for message in allChats[user]:
+            print(renderMessage(message, user), flush=True)
+
+        try:
+            while True:
+                newChats = fetch(chat, allChats, 120)["new"]
+                if len(newChats[user]) > 0:
+                    for message in newChats[user]:
+                        print(renderMessage(message, user), flush=True)
+                time.sleep(2)
+        except KeyboardInterrupt:
+            flush(chatsCache, allChats)
+
+
+if __name__ == "__main__":
+    if len(argv) > 1:
+        USER = argv[1]
+    else:
+        USER = input("Input user: ")
+
+    if len(argv) > 2:
+        FILTER_SENDER = argv[2]
+    elif len(argv) < 2:
+        FILTER_SENDER = input("Filter message sender? ")
+    else:
+        FILTER_SENDER = False
+
+    if len(argv) > 3:
+        FILTER_CHANNEL = argv[3]
+    elif len(argv) < 2:
+        FILTER_CHANNEL = input("Filter channel? ")
+    else:
+        FILTER_CHANNEL = False
+
+    chatMonitor(USER, FILTER_SENDER, FILTER_CHANNEL)
