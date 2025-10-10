@@ -161,8 +161,8 @@ def renderMessage(message: ChatMessage, user):
 def chatMonitor(
     user: str,
     /,
-    filter_sender: str | list | False | None = None,
-    filter_channel: str | list | False | None = None,
+    filter_sender: str | list | None = None,
+    filter_channel: str | list | None = None,
     chat: ChatAPI = ChatAPI(),
     cacheDir=f"{path[0]}/cache",
     allChats: dict[str, list[dict]] | None = None,
@@ -288,13 +288,13 @@ if __name__ == "__main__":
     elif len(argv) < 2:
         FILTER_SENDER = input("Filter message sender? ")
     else:
-        FILTER_SENDER = False
+        FILTER_SENDER = None
 
     if len(argv) > 3:
         FILTER_CHANNEL = argv[3]
     elif len(argv) < 2:
         FILTER_CHANNEL = input("Filter channel? ")
     else:
-        FILTER_CHANNEL = False
+        FILTER_CHANNEL = None
 
     chatMonitor(USER, FILTER_SENDER, FILTER_CHANNEL)
