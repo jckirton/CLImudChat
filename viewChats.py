@@ -187,6 +187,11 @@ def chatMonitor(
     fetch(chat, allChats, 600)
     flush(chatsCache, allChats)
 
+    if filter_sender == "":
+        filter_sender = None
+    if filter_channel == "":
+        filter_channel = None
+
     if type(filter_sender) is str:
         filter_sender = [filter_sender]
     if type(filter_channel) is str:
