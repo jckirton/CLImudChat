@@ -215,6 +215,7 @@ def chatMonitor(
         try:
             while True:
                 newChats = fetch(chat, allChats, 120)["new"]
+                flush(chatsCache, allChats)
                 if len(newChats[user]) > 0:
                     for message in newChats[user]:
                         if (
@@ -226,7 +227,8 @@ def chatMonitor(
                             pass
                 time.sleep(2)
         except KeyboardInterrupt:
-            flush(chatsCache, allChats)
+            pass
+            # flush(chatsCache, allChats)
 
     elif filter_sender:
         for message in allChats[user]:
@@ -238,6 +240,7 @@ def chatMonitor(
         try:
             while True:
                 newChats = fetch(chat, allChats, 120)["new"]
+                flush(chatsCache, allChats)
                 if len(newChats[user]) > 0:
                     for message in newChats[user]:
                         if message["from_user"] in filter_sender:
@@ -246,7 +249,8 @@ def chatMonitor(
                             pass
                 time.sleep(2)
         except KeyboardInterrupt:
-            flush(chatsCache, allChats)
+            pass
+            # flush(chatsCache, allChats)
 
     elif filter_channel:
         for message in allChats[user]:
@@ -258,6 +262,7 @@ def chatMonitor(
         try:
             while True:
                 newChats = fetch(chat, allChats, 120)["new"]
+                flush(chatsCache, allChats)
                 if len(newChats[user]) > 0:
                     for message in newChats[user]:
                         if message.get("channel", "tell") in filter_channel:
@@ -266,7 +271,8 @@ def chatMonitor(
                             pass
                 time.sleep(2)
         except KeyboardInterrupt:
-            flush(chatsCache, allChats)
+            pass
+            # flush(chatsCache, allChats)
     else:
         for message in allChats[user]:
             print(renderMessage(message, user), flush=True)
@@ -274,12 +280,14 @@ def chatMonitor(
         try:
             while True:
                 newChats = fetch(chat, allChats, 120)["new"]
+                flush(chatsCache, allChats)
                 if len(newChats[user]) > 0:
                     for message in newChats[user]:
                         print(renderMessage(message, user), flush=True)
                 time.sleep(2)
         except KeyboardInterrupt:
-            flush(chatsCache, allChats)
+            pass
+            # flush(chatsCache, allChats)
 
 
 if __name__ == "__main__":
