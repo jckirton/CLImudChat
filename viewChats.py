@@ -22,8 +22,19 @@ def flush(chatsCache, allChats):
         json.dump(allChats, f, indent=4)
 
 
-def fetch(chat: ChatAPI, allChats, seconds: int | float = 10, initial=False):
-    fetched: dict[str, list[dict]] = chat.read(after=seconds)
+def fetch(
+    chat: ChatAPI,
+    allChats: dict[str, list[dict]],
+    seconds: int | float = 10,
+    importData: dict[str, list[dict]] | None = None,
+):
+    fetched: dict[str, list[dict]]
+
+    if importData:
+        fetched = importData
+    else:
+        fetched = chat.read(after=seconds)
+
     newChats: dict[str, list[dict]] = {}.copy()
     for user in fetched:
         fetched[user].sort(key=lambda message: message["t"])
@@ -187,20 +198,28 @@ def chatMonitor(
     fetch(chat, allChats, 600)
     flush(chatsCache, allChats)
 
-    if filter_sender == "" or filter_sender == "none":
+    # print(filter_sender, filter_channel)
+
+    if filter_sender == "" or filter_sender == "none" or filter_sender == ["none"]:
         filter_sender = None
-    if filter_channel == "" or filter_channel == "none":
+    if filter_channel == "" or filter_channel == "none" or filter_channel == ["none"]:
         filter_channel = None
+
+    # print(filter_sender, filter_channel)
 
     if type(filter_sender) is str:
         filter_sender = [filter_sender]
     if type(filter_channel) is str:
         filter_channel = [filter_channel]
 
+    # print(filter_sender, filter_channel)
+
     if filter_channel:
         for channel in filter_channel:
             if channel == "tells":
                 filter_channel[filter_channel.index(channel)] = "tell"
+
+    # print(filter_sender, filter_channel)
 
     if filter_sender and filter_channel:
         for message in allChats[user]:
@@ -312,5 +331,7 @@ if __name__ == "__main__":
 
     if filterChannel:
         filterChannel = "".join(filterChannel.split(" ")).split(",")
+
+    # print(argv, user, filterSender, filterChannel)
 
     chatMonitor(user, filterSender, filterChannel)
