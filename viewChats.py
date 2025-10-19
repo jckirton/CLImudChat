@@ -178,6 +178,7 @@ def chatMonitor(
     cacheDir=f"{path[0]}/cache",
     allChats: dict[str, list[dict]] | None = None,
     live: bool = True,
+    write: bool = True,
 ):
     chatsCache = f"{cacheDir}/chatHistory.json"
 
@@ -197,7 +198,8 @@ def chatMonitor(
                 allChats[username] = []
 
     fetch(chat, allChats, 600)
-    flush(chatsCache, allChats)
+    if write:
+        flush(chatsCache, allChats)
 
     # print(filter_sender, filter_channel)
 
@@ -235,7 +237,8 @@ def chatMonitor(
         try:
             while live:
                 newChats = fetch(chat, allChats, 120)["new"]
-                flush(chatsCache, allChats)
+                if write:
+                    flush(chatsCache, allChats)
                 if len(newChats[user]) > 0:
                     for message in newChats[user]:
                         if (
@@ -247,7 +250,8 @@ def chatMonitor(
                             pass
                 time.sleep(2)
         except KeyboardInterrupt:
-            flush(chatsCache, allChats)
+            if write:
+                flush(chatsCache, allChats)
 
     elif filter_sender:
         for message in allChats[user]:
@@ -259,7 +263,8 @@ def chatMonitor(
         try:
             while live:
                 newChats = fetch(chat, allChats, 120)["new"]
-                flush(chatsCache, allChats)
+                if write:
+                    flush(chatsCache, allChats)
                 if len(newChats[user]) > 0:
                     for message in newChats[user]:
                         if message["from_user"] in filter_sender:
@@ -268,7 +273,8 @@ def chatMonitor(
                             pass
                 time.sleep(2)
         except KeyboardInterrupt:
-            flush(chatsCache, allChats)
+            if write:
+                flush(chatsCache, allChats)
 
     elif filter_channel:
         for message in allChats[user]:
@@ -280,7 +286,8 @@ def chatMonitor(
         try:
             while live:
                 newChats = fetch(chat, allChats, 120)["new"]
-                flush(chatsCache, allChats)
+                if write:
+                    flush(chatsCache, allChats)
                 if len(newChats[user]) > 0:
                     for message in newChats[user]:
                         if message.get("channel", "tell") in filter_channel:
@@ -290,7 +297,8 @@ def chatMonitor(
                 time.sleep(2)
         except KeyboardInterrupt:
             pass
-            # flush(chatsCache, allChats)
+            # if write:
+            #     flush(chatsCache, allChats)
     else:
         for message in allChats[user]:
             print(renderMessage(message, user), flush=True)
@@ -298,13 +306,15 @@ def chatMonitor(
         try:
             while live:
                 newChats = fetch(chat, allChats, 120)["new"]
-                flush(chatsCache, allChats)
+                if write:
+                    flush(chatsCache, allChats)
                 if len(newChats[user]) > 0:
                     for message in newChats[user]:
                         print(renderMessage(message, user), flush=True)
                 time.sleep(2)
         except KeyboardInterrupt:
-            flush(chatsCache, allChats)
+            if write:
+                flush(chatsCache, allChats)
 
 
 if __name__ == "__main__":
