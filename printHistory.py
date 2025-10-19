@@ -29,4 +29,4 @@ if __name__ == "__main__":
 
     # print(argv, user, filterSender, filterChannel)
 
-    chatMonitor(user, filterSender, filterChannel, live=False)
+    chatMonitor(user, filterSender, filterChannel, live=False, write=False)
