@@ -177,6 +177,7 @@ def chatMonitor(
     chat: ChatAPI = ChatAPI(),
     cacheDir=f"{path[0]}/cache",
     allChats: dict[str, list[dict]] | None = None,
+    live: bool = True,
 ):
     chatsCache = f"{cacheDir}/chatHistory.json"
 
@@ -232,7 +233,7 @@ def chatMonitor(
                 pass
 
         try:
-            while True:
+            while live:
                 newChats = fetch(chat, allChats, 120)["new"]
                 flush(chatsCache, allChats)
                 if len(newChats[user]) > 0:
@@ -256,7 +257,7 @@ def chatMonitor(
                 pass
 
         try:
-            while True:
+            while live:
                 newChats = fetch(chat, allChats, 120)["new"]
                 flush(chatsCache, allChats)
                 if len(newChats[user]) > 0:
@@ -277,7 +278,7 @@ def chatMonitor(
                 pass
 
         try:
-            while True:
+            while live:
                 newChats = fetch(chat, allChats, 120)["new"]
                 flush(chatsCache, allChats)
                 if len(newChats[user]) > 0:
@@ -295,7 +296,7 @@ def chatMonitor(
             print(renderMessage(message, user), flush=True)
 
         try:
-            while True:
+            while live:
                 newChats = fetch(chat, allChats, 120)["new"]
                 flush(chatsCache, allChats)
                 if len(newChats[user]) > 0:
