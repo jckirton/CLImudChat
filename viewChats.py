@@ -1,7 +1,7 @@
 import json
 import os
 from sys import path, argv
-from chat import ChatAPI
+from hackmudChatAPI import ChatAPI
 from typing import TypedDict, NotRequired
 import time
 

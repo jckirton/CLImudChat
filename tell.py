@@ -1,5 +1,5 @@
 from sys import argv
-from chat import ChatAPI
+from hackmudChatAPI import ChatAPI
 
 chat = ChatAPI()
 
