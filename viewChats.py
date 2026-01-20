@@ -1,20 +1,8 @@
 import json
 import os
 from sys import path, argv
-from hackmudChatAPI import ChatAPI
-from typing import TypedDict, NotRequired
+from hackmudChatAPI import ChatAPI, ChatMessage
 import time
-
-
-class ChatMessage(TypedDict):
-    id: str
-    t: float
-    from_user: str
-    msg: NotRequired[str]
-    channel: NotRequired[str]
-    is_leave: NotRequired[bool]
-    is_join: NotRequired[bool]
-    to_user: NotRequired[str]
 
 
 def flush(chatsCache, allChats):
@@ -24,18 +12,18 @@ def flush(chatsCache, allChats):
 
 def fetch(
     chat: ChatAPI,
-    allChats: dict[str, list[dict]],
+    allChats: dict[str, list[ChatMessage]],
     seconds: int | float = 10,
-    importData: dict[str, list[dict]] | None = None,
+    importData: dict[str, list[ChatMessage]] | None = None,
 ):
-    fetched: dict[str, list[dict]]
+    fetched: dict[str, list[ChatMessage]]
 
     if importData:
         fetched = importData
     else:
         fetched = chat.read(after=seconds)
 
-    newChats: dict[str, list[dict]] = {}.copy()
+    newChats: dict[str, list[ChatMessage]] = {}.copy()
     for user in fetched:
         fetched[user].sort(key=lambda message: message["t"])
         newChats[user] = []
@@ -176,13 +164,13 @@ def chatMonitor(
     filter_channel: str | list | None = None,
     chat: ChatAPI = ChatAPI(),
     cacheDir=f"{path[0]}/cache",
-    allChats: dict[str, list[dict]] | None = None,
+    allChats: dict[str, list[ChatMessage]] = {},
     live: bool = True,
     write: bool = True,
 ):
     chatsCache = f"{cacheDir}/chatHistory.json"
 
-    if allChats is None:
+    if not allChats:
         try:
             os.mkdir(cacheDir)
         except FileExistsError:
